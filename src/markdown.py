@@ -23,6 +23,7 @@ class MarkdownTestParser:
 
         # e.g.) ["大項目", "中項目", "小項目", "No.", "正常／異常", "テスト結果", "確認手順", "期待値", "備考"]
         self.columns = self.config.columns.model_fields.keys()
+        print('self.columns', self.columns)
         self.data = []
 
         self.pattern_section = re.compile(self.config.columns.section.md_pattern, re.MULTILINE)
@@ -85,14 +86,14 @@ class MarkdownTestParser:
 
                 # データフレーム用の行データ作成
                 self.data.append([
+                    len(self.data) + 1,
                     current_section,
                     current_subsection,
                     test_case_name,
-                    len(self.data) + 1,
                     test_case_type,
-                    test_result,
                     '\n'.join([f"{i + 1}. {step}" for i, step in enumerate(steps)]),
                     '\n'.join([f"・{expectation}" for expectation in expectations]),
+                    test_result,
                     '\n'.join([f"・{note}" for note in notes])
                 ])
 

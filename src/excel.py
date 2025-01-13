@@ -57,7 +57,7 @@ class ExcelWriter:
         )
 
         # ヘッダー（列）
-        for i in range(1, len(df_summary.columns) + 1):
+        for i in range(0, len(df_summary.columns) + 0):
             apply_cell_style(
                 worksheet[f"{self.col_names[i]}2"],
                 font=header_font,
@@ -77,7 +77,7 @@ class ExcelWriter:
             )
 
         # データセルのスタイル調整
-        for i, j in product(range(3, len(df_summary.index) + 3), range(2, len(df_summary.columns) + 1)):
+        for i, j in product(range(3, len(df_summary.index) + 3), range(0, len(df_summary.columns) + 0)):
             apply_cell_style(
                 worksheet[f"{self.col_names[j]}{i}"],
                 font=Font(name=self.config.excel_settings.font_name),
@@ -145,7 +145,7 @@ class ExcelWriter:
         """
         try:
             with pd.ExcelWriter(output_path) as writer:
-                self.__write_summary_sheet(writer)
+                # self.__write_summary_sheet(writer)
                 self.__write_test_specification_sheet(writer, merge_cells)
         except PermissionError:
             raise PermissionError(f"出力先のファイルを開いている可能性があります。エクセルファイルを閉じてください。")

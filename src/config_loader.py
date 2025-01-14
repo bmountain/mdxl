@@ -21,10 +21,16 @@ class Columns(BaseModel):
     subsection: Column = Field(...)
     testcase: Column = Field(...)
     pos_neg: Column = Field(..., alias="pos-neg")
+    notes: Column = Field(...)
     step: Column = Field(...)
     expectation: Column = Field(...)
+    conduction_date: Column = Field(...)
+    conductor: Column = Field(...)
     result: Column = Field(...)
-    notes: Column = Field(...)
+    check_date: Column = Field(...)
+    checker: Column = Field(...)
+    bikou: Column = Field(...)
+
 
 
 class SheetName(BaseModel):

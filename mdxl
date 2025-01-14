@@ -1,0 +1,4 @@
+#!/bin/bash
+target_file=$(realpath $1)
+source /usr/bin/src/mdxl/.venv/Scripts/activate
+python /usr/bin/src/mdxl/converter.py -f $target_file

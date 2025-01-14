@@ -32,6 +32,7 @@ class MarkdownTestParser:
         self.pattern_step = re.compile(self.config.columns.step.md_pattern, re.MULTILINE)
         self.pattern_expectation = re.compile(self.config.columns.expectation.md_pattern, re.MULTILINE)
         self.pattern_note = re.compile(self.config.columns.notes.md_pattern, re.MULTILINE)
+        self.pattern_bikou = re.compile(self.config.columns.bikou.md_pattern, re.MULTILINE)
 
     def parse(self) -> pd.DataFrame:
         """Markdownファイルを解析し、データフレーム用のデータを作成します。
@@ -66,14 +67,16 @@ class MarkdownTestParser:
             elif subsection_match:
                 current_subsection = subsection_match.group(1)
             elif testcase_match:
-                test_case_type, test_result, test_case_name = \
-                    testcase_match.group(1), testcase_match.group(2), testcase_match.group(3)
                 steps, expectations, notes = [], [], []
+                test_case_type, test_result, test_case_name = \
+                    testcase_match.group(1), testcase_match.group(2) , testcase_match.group(3)
+                steps, expectations, notes, conduction_date, conductor, check_date, checker, bikou = [], [], [], None, None, None, None, []
 
                 for subline in lines[i + 1:]:
                     step_match = self.pattern_step.match(subline)
                     expectation_match = self.pattern_expectation.match(subline)
                     note_match = self.pattern_note.match(subline)
+                    bikou_match = self.pattern_bikou.match(subline)
 
                     if step_match:
                         steps.append(step_match.group(1))
@@ -81,6 +84,8 @@ class MarkdownTestParser:
                         expectations.append(expectation_match.group(1))
                     elif note_match:
                         notes.append(note_match.group(1))
+                    elif bikou_match:
+                        bikou.append(bikou_match.group(1))
                     elif subline.startswith('####') or subline.startswith('###') or subline.startswith('##'):
                         break
 
@@ -91,17 +96,25 @@ class MarkdownTestParser:
                     current_subsection,
                     test_case_name,
                     test_case_type,
-                    '\n'.join([f"{i + 1}. {step}" for i, step in enumerate(steps)]),
-                    '\n'.join([f"・{expectation}" for expectation in expectations]),
+                    '\n'.join([f"{note}" for note in notes]),
+                    '\n'.join([f"{step}" for i, step in enumerate(steps)]),
+                    '\n'.join([f"{expectation}" for expectation in expectations]),
+                    conduction_date,
+                    conductor,
                     test_result,
-                    '\n'.join([f"・{note}" for note in notes])
+                    check_date,
+                    checker,
+                    '\n'.join([f"{bikou_el}" for bikou_el in bikou]),
                 ])
 
+        df = pd.DataFrame(self.data, columns=self.columns)
+        print(df[df['bikou'].notna()].head())
         return pd.DataFrame(self.data, columns=self.columns)
 
 
 def read_markdown_file(file_path: Path) -> str:
+    print(file_path)
     if not file_path.exists():
         raise FileNotFoundError(f"Markdownファイルが見つかりません: {file_path}")
-    with open(file_path, 'r', encoding='utf-8') as file:
+    with open(file_path, 'r', encoding='UTF-8') as file:
         return file.read()
